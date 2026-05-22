@@ -1,12 +1,61 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AGenNext Agent Builder</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AGenNext Agent Builder</title>
+  <style>
+    :root{font-family:Inter,system-ui,sans-serif;color:#111827;background:#f8fafc}body{margin:0}.app{display:flex;min-height:100vh}.side{width:260px;background:#0f172a;color:#fff;padding:24px}.side h1{margin:0;font-size:25px}.side p{color:#94a3b8}.nav{display:block;width:100%;margin:8px 0;padding:11px 12px;border:0;border-radius:10px;background:transparent;color:#cbd5e1;text-align:left;cursor:pointer}.nav.active{background:#4f46e5;color:#fff}.main{flex:1;padding:28px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}.top h2{margin:0;font-size:30px}.muted{color:#64748b}.panel{max-width:980px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 18px 50px rgba(15,23,42,.08);padding:22px;display:grid;gap:16px}.field{display:grid;gap:6px;font-weight:700;color:#334155}.field input,.field select,.field textarea{border:1px solid #cbd5e1;border-radius:10px;padding:11px 12px;font-size:14px}.primary{border:0;border-radius:12px;padding:12px 16px;background:#4f46e5;color:#fff;font-weight:800;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.card{padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#f8fafc}.card strong{display:block;margin-bottom:6px}.badge{display:inline-flex;border-radius:999px;background:#eef2ff;color:#4338ca;padding:4px 9px;font-size:12px;font-weight:800}.check{display:block;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#f8fafc}pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:16px;border-radius:14px;overflow:auto}.hidden{display:none}@media(max-width:800px){.app{display:block}.side{width:auto}.top{display:block}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <h1>AGenNext</h1><p>Agent Builder</p>
+    <button class="nav active" onclick="show('signup',this)">Sign Up</button>
+    <button class="nav" onclick="show('profile',this)">Profile</button>
+    <button class="nav" onclick="show('model',this)">Model Router</button>
+    <button class="nav" onclick="show('tools',this)">Tools / MCP</button>
+    <button class="nav" onclick="show('agent',this)">Create Agent</button>
+    <button class="nav" onclick="show('workflow',this)">Workflow</button>
+    <button class="nav" onclick="show('team',this)">Team Flow</button>
+    <button class="nav" onclick="show('runs',this)">Runs & Logs</button>
+    <button class="nav" onclick="show('debug',this)">Debug</button>
+    <button class="nav" onclick="show('traces',this)">Traces</button>
+    <button class="nav" onclick="show('approvals',this)">Approvals</button>
+    <button class="nav" onclick="show('spec',this);buildSpec()">Generated Spec</button>
+  </aside>
+  <main class="main">
+    <div class="top"><div><h2 id="title">Sign Up</h2><p class="muted">Launch shell for creating codifiable AGenNext agents.</p></div><button class="primary" onclick="show('spec');buildSpec()">Generate Spec</button></div>
+
+    <section id="signup" class="panel screen"><span class="badge">Identity</span><label class="field">Name<input id="name" placeholder="Your name"></label><label class="field">Email<input id="email" placeholder="you@example.com"></label><label class="field">Manager / Approver<input id="manager" placeholder="Manager name"></label><label class="field">Manager Email<input id="managerEmail" placeholder="manager@example.com"></label><label class="field">Manager Source<select id="managerSource"><option>hrms</option><option>manual</option></select></label><button class="primary" onclick="show('profile')">Continue</button></section>
+
+    <section id="profile" class="panel screen hidden"><span class="badge">Profile</span><label class="field">Role<input id="role" value="Developer"></label><label class="field">Organization<input id="org" value="AGenNext"></label><label class="field">Coding Style<select id="codingStyle"><option>balanced</option><option>fast</option><option>safe</option></select></label><label class="field">Environment<select id="env"><option>development</option><option>staging</option><option>production</option></select></label><button class="primary" onclick="show('model')">Continue</button></section>
+
+    <section id="model" class="panel screen hidden"><span class="badge">Model</span><label class="field">Provider Mode<select id="provider"><option>agennext-router</option><option>openai</option><option>anthropic</option><option>google</option><option>ollama</option><option>lm-studio</option><option>openai-compatible</option><option>custom</option></select></label><label class="field">Preferred Model<input id="modelName" value="agennext-router:auto"></label><label class="field">Router Policy<select id="policy"><option>balanced</option><option>fastest</option><option>cheapest</option><option>safest</option></select></label><label class="field">Router URL<input id="routerUrl" value="http://localhost:8080"></label><label class="field">Local LLM Base URL<input id="localUrl" value="http://localhost:11434"></label><button class="primary" onclick="show('tools')">Continue</button></section>
+
+    <section id="tools" class="panel screen hidden"><span class="badge">Tools</span><div class="grid"><label class="check"><input class="tool" value="github" type="checkbox" checked> GitHub</label><label class="check"><input class="tool" value="browser" type="checkbox" checked> Browser: search/open/screenshot</label><label class="check"><input class="tool" value="filesystem" type="checkbox" checked> Filesystem</label><label class="check"><input class="tool" value="terminal" type="checkbox"> Terminal</label><label class="check"><input class="tool" value="mcp" type="checkbox" checked> MCP</label><label class="check"><input class="tool" value="deployment" type="checkbox"> Deployment</label></div><label class="field">MCP Endpoint<input id="mcpEndpoint" placeholder="http://localhost:3001/mcp"></label><button class="primary" onclick="show('agent')">Continue</button></section>
+
+    <section id="agent" class="panel screen hidden"><span class="badge">Agent</span><label class="field">Agent Name<input id="agentName" value="Coding Agent"></label><label class="field">Description<textarea id="agentDesc">Inspect repos, propose patches, request approvals, and prepare pull requests.</textarea></label><label class="field">Repository<input id="repo" placeholder="AGenNext/example-repo"></label><label class="field">Default Branch<input id="branch" value="main"></label><button class="primary" onclick="show('workflow')">Continue</button></section>
+
+    <section id="workflow" class="panel screen hidden"><span class="badge">Workflow</span><label class="field">Workflow Name<input id="workflowName" value="Code Change Workflow"></label><label class="field">Trigger<select id="trigger"><option>manual</option><option>schedule</option><option>webhook</option><option>event</option><option>approval</option></select></label><label class="field">Approval Route<select id="approvalRoute"><option>manager</option><option>security</option><option>platform-admin</option></select></label><div class="card"><strong>Default steps</strong><p class="muted">Inspect repo → Build plan → Propose patch → Request approval → Run checks → Create PR</p></div><button class="primary" onclick="show('team')">Continue</button></section>
+
+    <section id="team" class="panel screen hidden"><span class="badge">Multi-Agent Team</span><div class="grid"><div class="card"><strong>Planner</strong><p>Creates plan</p></div><div class="card"><strong>Coder</strong><p>Writes patch</p></div><div class="card"><strong>Reviewer</strong><p>Reviews diff</p></div><div class="card"><strong>Tester</strong><p>Runs checks</p></div><div class="card"><strong>Deployer</strong><p>Prepares deploy</p></div></div><button class="primary" onclick="show('runs')">Create Agent</button></section>
+
+    <section id="runs" class="panel screen hidden"><span class="badge">Runs</span><div class="card"><strong>run_001</strong><p>Spec generated · ready for backend handoff</p></div><div class="card"><strong>run_002</strong><p>Approval route checked</p></div><div class="card"><strong>run_003</strong><p>Workflow validated</p></div></section>
+    <section id="debug" class="panel screen hidden"><span class="badge">Debug</span><div class="card"><strong>Diagnostics</strong><p>Manager, model, tools, workflow, approvals checked in shell.</p></div><div class="card"><strong>Backend</strong><p>Runtime connection pending.</p></div></section>
+    <section id="traces" class="panel screen hidden"><span class="badge">Traces</span><div class="card"><strong>signup.created</strong><p>ok</p></div><div class="card"><strong>model.configured</strong><p>ok</p></div><div class="card"><strong>agent.created</strong><p>ok</p></div><div class="card"><strong>workflow.created</strong><p>ok</p></div></section>
+    <section id="approvals" class="panel screen hidden"><span class="badge">Approvals</span><div class="card"><strong>Approval triggers</strong><p>file.write, command.execute, dependency.install, branch.push, pull_request.create, deployment.request</p></div><div class="card"><strong>Route</strong><p id="route">Manager / HRMS</p></div></section>
+    <section id="spec" class="panel screen hidden"><span class="badge">CodifiableAgentSpec</span><button class="primary" onclick="copySpec()">Copy JSON</button><pre id="specOut">{}</pre></section>
+  </main>
+</div>
+<script>
+const titles={signup:'Sign Up',profile:'Profile',model:'Model Router',tools:'Tools / MCP',agent:'Create Agent',workflow:'Workflow',team:'Team Flow',runs:'Runs & Logs',debug:'Debug',traces:'Traces',approvals:'Approvals',spec:'Generated Spec'};
+function show(id,btn){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.getElementById('title').innerText=titles[id];document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));if(btn)btn.classList.add('active');}
+function val(id){return document.getElementById(id)?.value||''}
+function tools(){return Array.from(document.querySelectorAll('.tool')).filter(x=>x.checked).map(x=>x.value)}
+function buildSpec(){const spec={kind:'coding-agent',version:'0.1.0',identity:{name:val('name'),email:val('email')},profile:{role:val('role'),organization:val('org'),codingStyle:val('codingStyle'),environment:val('env')},model:{providerMode:val('provider'),preferredModel:val('modelName'),routerPolicy:val('policy'),modelRouterUrl:val('routerUrl'),localBaseUrl:val('localUrl')},tools:tools(),browserTool:{search:true,openPage:true,screenshot:true},mcp:{endpoint:val('mcpEndpoint')},agent:{name:val('agentName'),description:val('agentDesc'),repository:val('repo'),defaultBranch:val('branch')},workflow:{name:val('workflowName'),trigger:val('trigger'),approvalRoute:val('approvalRoute')},team:{agents:['planner','coder','reviewer','tester','deployer']},approval:{managerName:val('manager'),managerEmail:val('managerEmail'),source:val('managerSource'),triggers:['file.write','command.execute','dependency.install','branch.push','pull_request.create','deployment.request']},runtimeHandoff:{target:'AGenNext Runtime',status:'ready_for_backend'}};document.getElementById('route').innerText=(spec.approval.managerName||'Manager')+' via '+spec.approval.source;document.getElementById('specOut').innerText=JSON.stringify(spec,null,2)}
+function copySpec(){buildSpec();navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('specOut').innerText)}
+</script>
+</body>
 </html>
