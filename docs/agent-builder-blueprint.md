@@ -4,13 +4,19 @@ Search marker: `AGenNext Agent Builder Power Profile`
 
 ## Current scope
 
-The initial Agent Builder release supports exactly one agent at a time.
+The initial Agent Builder release supports exactly one user-created agent at a time.
+
+There are two agent concepts in the builder experience:
+
+1. `Customer Onboarding Manager` — the helper agent that guides setup.
+2. `Target Agent` — the single agent draft the user is creating.
 
 ```text
 one signed-in user / tenant
-→ one default agent draft
+→ one Customer Onboarding Manager session
+→ one default Target Agent draft
 → one guided chat onboarding flow
-→ one validated final agent
+→ one validated final Target Agent
 ```
 
 ## Three-repo boundary
@@ -40,7 +46,7 @@ Single-agent builder workflow/control plane.
 Owns:
 
 - Customer Onboarding Manager chat experience
-- default agent draft loading UX
+- default Target Agent draft loading UX
 - minimum input collection
 - skill/tool recommendation and confirmation
 - environment/RAG setup UX
@@ -60,9 +66,11 @@ Owns:
 - reusable graph/status components
 - design tokens and themes
 
-## Customer Onboarding Manager
+## Agent roles
 
-The onboarding agent persona is `Customer Onboarding Manager`.
+### Customer Onboarding Manager
+
+The onboarding helper persona is `Customer Onboarding Manager`.
 
 It behaves like a junior customer success manager:
 
@@ -74,7 +82,24 @@ It behaves like a junior customer success manager:
 - recommends only what is needed
 - never behaves like a runtime/admin agent
 
-## Allowed skill
+It is not the user's final agent. It only helps create the Target Agent draft.
+
+### Target Agent
+
+The Target Agent is the single user-created agent.
+
+It starts as a default draft after first sign-in and becomes a final runnable agent only after Agent-BE validation.
+
+The Target Agent:
+
+- has all default feature sections from the start
+- cannot grant itself capabilities
+- cannot assign itself skills/tools
+- cannot authenticate tools
+- cannot finalize itself
+- cannot execute anything while it is still a draft
+
+## Customer Onboarding Manager skill
 
 The Customer Onboarding Manager has exactly one skill:
 
@@ -82,21 +107,21 @@ The Customer Onboarding Manager has exactly one skill:
 agent_creator
 ```
 
-## Allowed actions
+## Customer Onboarding Manager allowed actions
 
 The Customer Onboarding Manager may:
 
 - chat with the user
-- collect minimum agent intent/description
-- recommend minimum required skills
-- recommend minimum required tools/connectors
+- collect minimum Target Agent intent/description
+- recommend minimum required skills for the Target Agent
+- recommend minimum required tools/connectors for the Target Agent
 - ask the user to confirm skills/tools
 - guide knowledge/RAG setup
 - guide environment setup
 - call Agent-BE builder APIs for draft updates and validation status
 - show finalization readiness returned by Agent-BE
 
-## Not allowed
+## Customer Onboarding Manager not allowed
 
 The Customer Onboarding Manager must not:
 
@@ -111,20 +136,9 @@ The Customer Onboarding Manager must not:
 - orchestrate multiple agents
 - grant capabilities without user confirmation
 
-## Core rule
+## Target Agent default sections
 
-```text
-Customer Onboarding Manager suggests.
-User confirms.
-Agent-BE validates.
-Agent-BE finalizes.
-```
-
-## First sign-in behavior
-
-On first sign-in, the builder must load or create exactly one default agent draft through Agent-BE.
-
-The draft should already expose all default sections as configurable states:
+The Target Agent draft should expose these sections immediately:
 
 - intent / description
 - knowledge / RAG
@@ -144,11 +158,26 @@ The draft should already expose all default sections as configurable states:
 
 Missing values are shown as `unconfigured`, not absent.
 
+## Core rule
+
+```text
+Customer Onboarding Manager suggests.
+User confirms.
+Agent-BE validates.
+Agent-BE finalizes the Target Agent.
+```
+
+## First sign-in behavior
+
+On first sign-in, the builder must load or create exactly one default Target Agent draft through Agent-BE.
+
+The Customer Onboarding Manager opens the chat and helps the user configure that draft.
+
 ## Chat interface sections
 
 The chat interface should expose:
 
-1. Describe agent
+1. Describe Target Agent
 2. Confirm recommended minimum skills
 3. Confirm recommended minimum tools
 4. Add knowledge/RAG
@@ -161,4 +190,4 @@ The chat interface should expose:
 
 Agent-Builder and Agent-UI never create the final runnable `agent_id`.
 
-Only Agent-BE can assign the final `agent_id`, and only after the single-agent draft validates against upstream schema, policy, auth, environment, artifact, and runtime enforcement requirements.
+Only Agent-BE can assign the final `agent_id`, and only after the single Target Agent draft validates against upstream schema, policy, auth, environment, artifact, and runtime enforcement requirements.
