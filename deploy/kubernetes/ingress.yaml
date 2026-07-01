@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agent-builder
+  namespace: agennext
+  labels:
+    app.kubernetes.io/name: agent-builder
+    app.kubernetes.io/part-of: agennext
+    app.kubernetes.io/component: a2ui-preview
+    app.kubernetes.io/managed-by: pod-manager
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - agent-builder.agnext.local
+      secretName: agent-builder-tls
+  rules:
+    - host: agent-builder.agnext.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: agent-builder
+                port:
+                  name: http
