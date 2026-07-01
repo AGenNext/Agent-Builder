@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-builder
+  namespace: agennext
+  labels:
+    app.kubernetes.io/name: agent-builder
+    app.kubernetes.io/part-of: agennext
+    app.kubernetes.io/component: a2ui-preview
+    app.kubernetes.io/managed-by: pod-manager
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agent-builder
+      app.kubernetes.io/component: a2ui-preview
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agent-builder
+        app.kubernetes.io/part-of: agennext
+        app.kubernetes.io/component: a2ui-preview
+        app.kubernetes.io/managed-by: pod-manager
+    spec:
+      containers:
+        - name: agent-builder
+          image: ghcr.io/agennext/agent-builder:preview
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
+            - name: PORT
+              value: "3000"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

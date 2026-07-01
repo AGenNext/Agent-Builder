@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agennext
+  labels:
+    app.kubernetes.io/part-of: agennext
+    app.kubernetes.io/managed-by: pod-manager
