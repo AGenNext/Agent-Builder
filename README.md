@@ -1,6 +1,22 @@
 # Agent Builder
 
-Agent Builder now includes an A2UI TypeScript SDK and a Next.js demo app.
+Agent Builder is the first production feature candidate for AGenNext.
+
+It provides an A2UI TypeScript SDK and a Next.js demo app for safely rendering declarative agent-authored interfaces.
+
+## Product responsibility
+
+Agent Builder owns the agent-to-interface authoring surface.
+
+It lets an agent describe a UI as a safe declarative payload. The client application decides how that payload renders into trusted native components.
+
+```text
+Agent intent
+  -> A2UI JSON
+  -> validation
+  -> React renderer
+  -> user-approved UI action
+```
 
 ## Structure
 
@@ -13,12 +29,29 @@ packages/
   a2ui-react/       React renderer for A2UI payloads
 ```
 
-## Run the Next.js demo
+## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev:next
 ```
+
+## Build
+
+```bash
+npm ci
+npm run build
+npm run build:next
+```
+
+## Container build
+
+```bash
+docker build -t agennext-agent-builder:local .
+docker run --rm -p 3000:3000 agennext-agent-builder:local
+```
+
+Then open `http://localhost:3000`.
 
 ## A2UI concept
 
@@ -55,7 +88,7 @@ export function Demo() {
 
 ## Packages
 
-### `@a2ui/core`
+### `@agennext/a2ui-core`
 
 Provides:
 
@@ -64,7 +97,7 @@ Provides:
 - action helpers
 - declarative builders
 
-### `@a2ui/react`
+### `@agennext/a2ui-react`
 
 Provides:
 
@@ -73,3 +106,16 @@ Provides:
 - local state bindings
 - action dispatch hooks
 - custom renderer registry support
+
+## Release readiness
+
+This repo is releaseable when the following pass on every pull request:
+
+- dependency install with `npm ci`
+- TypeScript/Vite build with `npm run build`
+- Next.js demo build with `npm run build:next`
+- Docker image build with `docker build .`
+
+## Release target
+
+The first release target is a containerized Next.js demo of Agent Builder + A2UI. This is the first AGenNext product feature that can be shipped independently and then composed into Agent Platform.
