@@ -8,6 +8,7 @@ This runbook manages the `agent-builder` Kubernetes workload.
 
 It covers:
 
+- image publish
 - apply
 - verify
 - logs
@@ -24,6 +25,16 @@ Default image:
 ghcr.io/agennext/agent-builder:preview
 ```
 
+The container release workflow publishes this image to GHCR from `main` and from semver tags.
+
+Published tags include:
+
+- `preview`
+- `main`
+- `sha-<commit>`
+- `<version>` for semver tags such as `v0.1.0`
+- `<major>.<minor>` for semver tags such as `v0.1.0`
+
 Build locally before publishing:
 
 ```bash
@@ -31,6 +42,16 @@ docker build -t ghcr.io/agennext/agent-builder:preview .
 ```
 
 For a local cluster that can see local images, retag or preload the image according to the cluster runtime.
+
+## Publish image
+
+After changes merge to `main`, GitHub Actions publishes the container image automatically.
+
+Manual publish can be triggered from:
+
+```text
+Actions -> Container Release -> Run workflow
+```
 
 ## Apply
 
