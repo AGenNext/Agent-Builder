@@ -8,8 +8,24 @@ on:
 
 jobs:
   build:
+    name: Build and package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages and Vite shell
+        run: npm run build
+
+      - name: Build Next demo
+        run: npm run build:next
+
       - name: Build Docker image
-        run: docker build .
+        run: docker build -t agennext-agent-builder:ci .
